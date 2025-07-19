@@ -1,0 +1,64 @@
+server:
+  servlet:
+    context-path: /user
+    encoding:
+      charset: utf-8
+      force-request: false
+
+logging:
+  config: classpath:log4j2.xml
+        
+spring:
+  profiles:
+    active: local
+  
+#  datasource:
+#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
+#  h2:
+#    console:
+#      enabled: true
+
+user:
+  datasource-list:
+    appds:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+      primary: true
+      alias: appDataSource
+      mybatis:
+        config-location: classpath:config/configuration.xml
+        mapper-locations: classpath:mapper/*.xml
+   
+    devonds:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+#      alias: devonDataSource  없으면 키와 동일
+      mybatis:
+        config-location: classpath:config/configuration.xml
+        mapper-locations: classpath:mapper/*.xml
+        
+## Swagger config
+springdoc:
+  title: zzz API Documents
+  version: v0.0.1
+  description: zzz-online API 
+  packages-to-scan: user
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: swagger-ui.html
+#    tags-sorter: alpha
+#    operations-sorter: alpha
+  api-docs:
+    path: /api-docs/json
+    groups:
+      enabled: true
+  cache:
+    disabled: true 

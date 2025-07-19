@@ -1,0 +1,23 @@
+plugins {
+	id "application"
+	id 'org.springframework.boot'  //version '3.4.1'
+}
+
+dependencies {
+	implementation project(":UserCore")
+	implementation project(":UserExtend")
+	implementation "org.springframework.boot:spring-boot-devtools"
+}
+/*application {
+	mainClass = ""
+}*/
+
+bootRun {
+	jvmArgs = [
+		"-Xms512m",
+		"-Xmx1024m",
+		"--enable-native-access=ALL-UNNAMED",
+		"-Dfile.encoding=UTF-8"
+	]
+}
+

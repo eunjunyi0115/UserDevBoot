@@ -1,0 +1,1 @@
+INSERT INTO testuser (name, email) VALUES ('홍길동', 'hong@example.com');

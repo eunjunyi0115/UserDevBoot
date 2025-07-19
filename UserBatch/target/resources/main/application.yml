@@ -1,0 +1,39 @@
+# Spring Batch 메타데이터 테이블 자동 생성
+spring:
+  batch:
+    initialize-schema: always
+#    schema: classpath:/org/springframework/batch/core/schema-h2.sql
+    job:
+      enabled: false #자동으로 job 실행안함.
+  main.web-application-type: none
+  h2.console.enabled: true
+spring.sql.init.mode: always
+spring.main.allow-bean-definition-overriding: true
+
+logging.level.org.springframework.batch: DEBUG
+logging.level.org.springframework.jdbc.datasource.init.ScriptUtils: DEBUG
+user:
+  datasource-list:
+    appds:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+      primary: true
+      mybatis:
+        config-location: classpath:config/configuration.xml
+        mapper-locations: classpath:mapper/*.xml
+   
+    devonds:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+      mybatis:
+        config-location: classpath:config/configuration.xml
+        mapper-locations: classpath:mapper/*.xml
+  
+h2:
+  console:
+    enabled: true
+    path: /h2-console

@@ -1,0 +1,3 @@
+def profile = project.hasProperty("profile")?project.getProperty("profile") : "local"
+println "target Profile= ${profile}"
+

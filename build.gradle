@@ -1,0 +1,205 @@
+buildscript{
+	ext{
+		springBootVersion = '3.4.1'
+	}
+	repositories {
+	   mavenCentral()
+       mavenLocal()
+	} 
+	dependencies{
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("com.guardsquare:proguard-gradle:7.4.0")  
+	}
+}
+
+var profile = project.hasProperty("profile") ? project.getProperty("profile"):"local"
+println "RUN PROFILE: ${profile}"
+
+allprojects {
+    group = 'user.dev.app'
+    version = '1.0.0'
+    
+    tasks.withType(JavaCompile){
+       options.encoding = 'UTF-8'
+       options.compilerArgs << '-Xlint:none'
+    }
+    
+    dependencies {
+    }
+}
+	
+subprojects {
+
+	apply plugin: "java" //compile사용가능.
+	apply plugin: "java-library"  //api와 implement 모두사용가능
+	apply plugin: "maven-publish" 
+	apply plugin: "io.spring.dependency-management" //의존성 자동 버전관리
+	apply plugin: "war" 
+	apply plugin: "eclipse" 
+	
+    sourceCompatibility = JavaVersion.VERSION_24
+	targetCompatibility = JavaVersion.VERSION_24
+	
+
+	//소스폴더 없을시 폴더 생성. initSourceFolders 와 동일
+    task initSourceFolders {
+    	if( ! "${project.name}".endsWith("Starter") ) {
+	    	sourceSets*.java.srcDirs*.each{
+	    		if(!it.exists()){it.mkdirs()}
+	    	}
+	    	sourceSets*.resources.srcDirs*.each{
+	    		if(!it.exists()){it.mkdirs()}
+	    	}
+    	}
+    }
+    
+    //autoconfiguration 파일 생성
+    if (project.plugins.hasPlugin('java') && !"${project.name}".endsWith("Starter")) {
+	    def autoFile = file("src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports")
+	    if(!autoFile.exists()){
+	    	project.mkdir(autoFile.parentFile)
+	    	autoFile.text = ""
+	    }
+    }
+    
+    println "SUB CHECK '${project.name}'MAKE CONFIRM."
+
+	//이클립스 컴파일 클래스 위치 지정
+	eclipse.classpath.file.whenMerged {
+        def sourcefolder = entries.find { it.path == 'src/main/java' }
+        if (sourcefolder != null) {
+            sourcefolder.output = "target/classes/main"
+        }
+        sourcefolder = entries.find { it.path == 'src/test/java' }
+        if (sourcefolder != null) {
+            sourcefolder.output = "target/classes/test"
+        }
+        sourcefolder = entries.find { it.path == 'src/main/resources' }
+        if (sourcefolder != null) {
+            sourcefolder.output = "target/resources/main"
+        }
+        sourcefolder = entries.find { it.path == 'src/test/resources' }
+        if (sourcefolder != null) {
+            sourcefolder.output = "target/resources/test"
+        }
+    }
+    
+    repositories {
+       mavenCentral()
+       mavenLocal()
+    }
+    
+    //BOM 으로 버전관리를 하므로 버전을 정의하지 않는다.
+    dependencies {
+	    // Use JUnit Jupiter for testing.
+	    implementation "com.h2database:h2:2.2.224"
+	    annotationProcessor "org.projectlombok:lombok"
+    	compileOnly "org.projectlombok:lombok"
+		implementation "org.springframework.boot:spring-boot-starter-web"
+		testImplementation "org.springframework.boot:spring-boot-starter-test"
+		implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+		implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+		implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+		implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4"
+		implementation "com.google.guava:guava:32.1.3-jre"
+		implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0"
+		configurations {
+            all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        }
+        
+        //내장 Tomcat 제거
+        providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	}
+	
+/*	configurations {
+		all { //implementation , api, compileOnly, runtimeOnly, testImplementation, annotationProcessor 을 모두 표현함.
+			exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+		}
+	}*/
+	
+	//BOM 설정 버전으로 자동 사용된다.
+	dependencyManagement {
+	    imports {
+	        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+	    }
+	    dependencies {
+	    	dependency  "org.projectlombok:lombok:1.18.36"
+	    }
+	} 
+	
+	java {
+		withJavadocJar()
+		if("$profile" == "private") {
+			withSourcesJar()
+		}
+	}
+	
+	javadoc {
+		options.addStringOption("locale", "ko_KR")
+		options.addStringOption("encoding", "UTF-8")
+		options.addStringOption("charset", "UTF-8")
+		options.addStringOption("decencoding", "UTF-8")
+		options.addStringOption("Xmaxerrs", "1000")
+		options.addStringOption("Xmaxwarns", "1000")
+		options.addStringOption("Xdoclint:none", "-quiet") //JVM 경고 끄는 옵션
+	}
+}
+
+task printAllSourceSets {
+    group = "Custom"
+    description = "Prints sourceSets for all projects."
+
+    doLast {
+        allprojects { project ->
+            if (project.plugins.hasPlugin('java')) {
+                println "===== Project: ${project.name} ====="
+                project.sourceSets.each { sourceSet ->
+                    println " => SourceSet: ${sourceSet.name}"
+                    println "    - Java: ${sourceSet.java.srcDirs}"
+                    println "    - Resources: ${sourceSet.resources.srcDirs}"
+                    println "    - Output: ${sourceSet.output.classesDirs.files}"
+                    
+                    var pathStr = ""
+                    sourceSet.compileClasspath.files.each { file->pathStr += "${file.name}," }
+                    println "    - Compile Classpath: ${sourceSet.compileClasspath.files.size()} files"
+                    println "    - compileClasspath Class: ${pathStr} "
+                    
+                    pathStr = ""
+                    sourceSet.runtimeClasspath.files.each { file->pathStr += "${file.name}," }
+                    println "    - Runtime Classpath: ${sourceSet.runtimeClasspath.files.size()} files"
+                    println "    - runtimeClasspath Class: ${pathStr} "
+                    println ""
+                }
+            } else {
+                println "===== Project: ${project.name} (no Java plugin applied) ====="
+            }
+        }
+    }
+}
+
+task createSubPath{
+	group = "Custom"
+	
+}
+
+task createSourceFolder{
+	group = "Custom"
+    description = "Prints sourceSets for all projects."
+
+    doLast {
+        allprojects { project ->
+            if (project.plugins.hasPlugin('java')) {
+            	file("${project.projectDir}/src/main/java").mkdirs()
+				file("${project.projectDir}/src/main/resources").mkdirs()
+				file("${project.projectDir}/src/test/java").mkdirs()
+				file("${project.projectDir}/src/test/resources").mkdirs()
+            }
+        }
+	}
+	
+}
+
+//file("${project.projectDir}/src/main/java").mkdirs()
+//file("${project.projectDir}/src/main/resources").mkdirs()
+//file("${project.projectDir}/src/test/java").mkdirs()
+//file("${project.projectDir}/src/test/resources").mkdirs()

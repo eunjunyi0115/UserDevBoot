@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "file://C:/project/workspace/UserDevBoot/UserApp/src/main/resources/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="UserTest">
+
+  <select id="findAll" resultType="user.dev.dto.model.UserTest">
+    SELECT * FROM testuser
+  </select>
+
+  <select id="findAll1233" resultType="user.dev.dto.model.UserTest">
+    SELECT * FROM testuser
+  </select>
+</mapper> 

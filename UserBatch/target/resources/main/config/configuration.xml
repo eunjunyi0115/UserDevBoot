@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "file://C:/project/workspace/UserDevBoot/UserApp/src/main/resources/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+  <!-- 1. 설정 -->
+  <settings> 
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+    <setting name="cacheEnabled" value="true"/>
+    <setting name="lazyLoadingEnabled" value="false"/>
+  </settings> 
+
+  <!-- 2. 타입 별칭 설정
+  <typeAliases>
+    <package name="com.example.domain"/>
+  </typeAliases> -->
+
+  <!-- 3. 플러그인 설정 (옵션) -->
+  <!--
+  <plugins>
+    <plugin interceptor="org.mybatis.example.ExamplePlugin"/>
+  </plugins>
+  -->
+
+  <!-- 4. 환경 설정 (Spring과 함께 쓰면 보통 생략) -->
+  <!--
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+        <property name="username" value="root"/>
+        <property name="password" value="password"/>
+      </dataSource>
+    </environment>
+  </environments>
+  -->
+
+  <!-- 5. 매퍼 파일 등록 -->
+<!--  <mappers> -->
+ <!--   <mapper resource="mapper/UserMapper.xml"/> -->
+ <!--   <mapper resource="mapper/OrderMapper.xml"/> -->
+    <!-- 또는 -->
+    <!-- <package name="com.example.mapper"/> -->
+<!--   </mappers> -->
+
+</configuration>
