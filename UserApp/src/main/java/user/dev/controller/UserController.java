@@ -36,7 +36,7 @@ public class UserController {
 	private CommonDao commDao;
 	
 	@Autowired
-	private CommonDaoMultiSqlSessionFactory factory;
+	private CommonDaoMultiSqlSessionFactory factory; 
 	
 	@RequestMapping("/telegram/call")
 	@Operation(summary = "사용자 목록 조회", description = "모든 사용자 정보를 조회합니다")
